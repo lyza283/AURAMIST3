@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ROMEROS KINGDOM</title>
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-purple: #8b5cf6;
+      --dark-purple: #6d28d9;
+      --light-purple: #a78bfa;
+      --accent-blue: #3b82f6;
+      --light-blue: #60a5fa;
+      --dark-bg: #0f0f23;
+      --card-bg: #1e1b4b;
+      --text-white: #ffffff;
+      --text-gray: #94a3b8;
+      --border-color: rgba(139, 92, 246, 0.3);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, var(--dark-bg) 0%, #1e1b4b 100%);
+      color: var(--text-white);
+      min-height: 100vh;
+    }
+
+    /* Header */
+    #header {
+      height: 70px;
+      background: rgba(30, 27, 75, 0.9);
+      border-bottom: 1px solid var(--border-color);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 80px 20px;
+      text-align: center;
+      background: linear-gradient(135deg, var(--card-bg) 0%, var(--dark-purple) 100%);
+    }
+
+    .hero h2 {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary-purple), var(--accent-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 20px;
+      letter-spacing: 0.05em;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 60px 20px;
+    }
+
+    .container h1 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      text-align: center;
+      margin-bottom: 50px;
+      color: var(--primary-purple);
+      font-weight: 600;
+    }
+
+    /* Category Filter */
+    .category-filter {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    .category-btn {
+      padding: 8px 16px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-white);
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .category-btn:hover, .category-btn.active {
+      background: var(--primary-purple);
+      border-color: var(--primary-purple);
+    }
+
+    /* Products Grid */
+    .products-grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 25px;
+    }
+
+    .product-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--primary-purple);
+      box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2);
+    }
+
+    /* Product Image Gallery */
+    .product-image-gallery {
+      position: relative;
+      height: 250px;
+      overflow: hidden;
+    }
+
+    .product-image-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .product-image {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+    }
+
+    .product-image.active {
+      opacity: 1;
+    }
+
+    .product-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .product-card:hover .product-image img {
+      transform: scale(1.05);
+    }
+
+    /* Gallery Navigation */
+    .gallery-nav {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    .gallery-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .gallery-dot.active {
+      background: var(--primary-purple);
+      transform: scale(1.2);
+    }
+
+    .gallery-dot:hover {
+      background: var(--light-purple);
+    }
+
+    /* Gallery Arrows */
+    .gallery-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      border: none;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+
+    .product-card:hover .gallery-arrow {
+      opacity: 1;
+    }
+
+    .gallery-arrow:hover {
+      background: rgba(139, 92, 246, 0.8);
+    }
+
+    .gallery-arrow.prev {
+      left: 10px;
+    }
+
+    .gallery-arrow.next {
+      right: 10px;
+    }
+
+    /* Image Counter */
+    .image-counter {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      z-index: 10;
+    }
+
+    .product-info {
+      padding: 20px;
+    }
+
+    .product-category {
+      display: inline-block;
+      padding: 4px 8px;
+      background: rgba(139, 92, 246, 0.2);
+      color: var(--light-purple);
+      border-radius: 4px;
+      font-size: 0.8rem;
+      margin-bottom: 8px;
+    }
+
+    .product-name {
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      color: var(--text-white);
+      font-weight: 600;
+    }
+
+    .product-price {
+      font-size: 1.3rem;
+      color: var(--primary-purple);
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .product-stock {
+      color: var(--text-gray);
+      margin-bottom: 15px;
+      font-size: 0.9rem;
+    }
+
+    .quantity-input {
+      width: 100%;
+      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: var(--text-white);
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .quantity-input:focus {
+      outline: none;
+      border-color: var(--primary-purple);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-add-cart {
+      flex: 1;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      font-size: 0.9rem;
+      text-decoration: none;
+      border: none;
+      background: var(--primary-purple);
+      color: white;
+    }
+
+    .btn-add-cart:hover {
+      background: var(--dark-purple);
+    }
+
+    .btn-view-details {
+      flex: 1;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      font-size: 0.9rem;
+      text-decoration: none;
+      border: none;
+      background: var(--accent-blue);
+      color: white;
+    }
+
+    .btn-view-details:hover {
+      background: var(--light-blue);
+    }
+
+    /* Modal Customization */
+    .modal-content {
+      background-color: var(--card-bg);
+      color: var(--text-white);
+      border: 1px solid var(--border-color);
+    }
+
+    .modal-header {
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-footer {
+      border-top: 1px solid var(--border-color);
+    }
+
+    .btn-close {
+      filter: invert(1);
+    }
+
+    .product-description {
+      color: var(--text-gray);
+      margin-bottom: 20px;
+    }
+
+    /* Modal Image Gallery */
+    .modal-image-gallery {
+      position: relative;
+      height: 350px;
+      overflow: hidden;
+      border-radius: 8px;
+    }
+
+    .modal-image-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .modal-gallery-nav {
+      position: absolute;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      z-index: 10;
+    }
+
+    .modal-gallery-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .modal-gallery-dot.active {
+      background: var(--primary-purple);
+      transform: scale(1.2);
+    }
+
+    .modal-gallery-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+
+    .modal-gallery-arrow:hover {
+      background: rgba(139, 92, 246, 0.8);
+    }
+
+    .modal-gallery-arrow.prev {
+      left: 15px;
+    }
+
+    .modal-gallery-arrow.next {
+      right: 15px;
+    }
+
+    /* Reviews Section Styles */
+    .reviews-container {
+      max-height: 300px;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+    
+    .review-card {
+      background-color: rgba(30, 27, 75, 0.5);
+      border: 1px solid var(--border-color);
+      margin-bottom: 15px;
+      border-radius: 8px;
+    }
+    
+    .rating {
+      font-size: 1rem;
+    }
+    
+    .text-purple {
+      color: var(--primary-purple);
+    }
+    
+    .bg-purple {
+      background-color: var(--primary-purple);
+    }
+
+    .review-author {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .review-date {
+      font-size: 0.8rem;
+      color: var(--text-gray);
+    }
+
+    .review-text {
+      margin-top: 10px;
+    }
+
+    .no-reviews {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-gray);
+    }
+
+    .reviews-title {
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+
+    .text-warning {
+      color: #ffc107 !important;
+    }
+    .review-images-container {
+    margin-top: 10px;
+  }
+
+.review-image-thumbnail {
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.review-image-thumbnail:hover {
+    transform: scale(1.05);
+}
+
+.img-thumbnail {
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: rgba(30, 27, 75, 0.5);
+}
+
+/* Footer Styles */
+.footer {
+  background: linear-gradient(135deg, var(--dark-bg) 0%, var(--card-bg) 100%);
+  border-top: 1px solid var(--border-color);
+  padding: 60px 0 30px;
+  margin-top: 80px;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.footer-section h3 {
+  color: var(--primary-purple);
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.footer-section h3::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(135deg, var(--primary-purple), var(--accent-blue));
+  border-radius: 2px;
+}
+
+.footer-section p {
+  color: var(--text-gray);
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-links li {
+  margin-bottom: 12px;
+}
+
+.footer-links a {
+  color: var(--text-gray);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-links a:hover {
+  color: var(--primary-purple);
+  padding-left: 5px;
+}
+
+.footer-links i {
+  font-size: 0.9rem;
+  width: 16px;
+}
+
+.contact-info {
+  list-style: none;
+  padding: 0;
+}
+
+.contact-info li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 15px;
+  color: var(--text-gray);
+}
+
+.contact-info i {
+  color: var(--primary-purple);
+  font-size: 1.1rem;
+  width: 20px;
+  text-align: center;
+}
+
+.social-links {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 45px;
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  color: var(--text-gray);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-size: 1.2rem;
+}
+
+.social-link:hover {
+  background: var(--primary-purple);
+  border-color: var(--primary-purple);
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(139, 92, 246, 0.3);
+}
+
+.newsletter {
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 25px;
+  text-align: center;
+}
+
+.newsletter h4 {
+  color: var(--primary-purple);
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.newsletter p {
+  margin-bottom: 20px;
+  color: var(--text-gray);
+  font-size: 0.95rem;
+}
+
+.newsletter-form {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.newsletter-form input {
+  flex: 1;
+  padding: 12px 15px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-white);
+  font-size: 0.95rem;
+}
+
+.newsletter-form input:focus {
+  outline: none;
+  border-color: var(--primary-purple);
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+}
+
+.newsletter-form input::placeholder {
+  color: var(--text-gray);
+}
+
+.newsletter-form button {
+  padding: 12px 20px;
+  background: var(--primary-purple);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.newsletter-form button:hover {
+  background: var(--dark-purple);
+  transform: translateY(-1px);
+}
+
+.footer-bottom {
+  border-top: 1px solid var(--border-color);
+  padding-top: 30px;
+  text-align: center;
+}
+
+.footer-bottom-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.copyright {
+  color: var(--text-gray);
+  font-size: 0.9rem;
+}
+
+.footer-bottom-links {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.footer-bottom-links a {
+  color: var(--text-gray);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.footer-bottom-links a:hover {
+  color: var(--primary-purple);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .newsletter-form {
+    flex-direction: column;
+  }
+  
+  .footer-bottom-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .footer-bottom-links {
+    justify-content: center;
+  }
+  
+  .social-links {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer {
+    padding: 40px 0 20px;
+  }
+  
+  .footer-content {
+    padding: 0 15px;
+  }
+  
+  .newsletter {
+    padding: 20px 15px;
+  }
+}
+  </style>
+</head>
+
+<body>
+  <div id="header"></div>
+
+  <main>
+    <section class="hero">
+      <div class="hero-content">
+        <h2>ROMEROS KINGDOM</h2>
+      </div>
+    </section>
+
+    <div class="container" id="items">
+      <h1>Shop Products</h1>
+      <div class="category-filter" id="categoryFilter">
+        <!-- Categories will be loaded here -->
+      </div>
+      <div class="products-grid-container"></div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-grid">
+        <!-- About Section -->
+        <div class="footer-section">
+          <h3>About ROMEROS KINGDOM</h3>
+          <p>Your premier destination for quality products and exceptional shopping experience. We pride ourselves on offering the finest selection with unmatched customer service.</p>
+          <div class="social-links">
+            <a href="#" class="social-link" title="Facebook">
+              <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="#" class="social-link" title="Instagram">
+              <i class="fab fa-instagram"></i>
+            </a>
+            <a href="#" class="social-link" title="Twitter">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="#" class="social-link" title="TikTok">
+              <i class="fab fa-tiktok"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="footer-section">
+          <h3>Quick Links</h3>
+          <ul class="footer-links">
+            <li><a href="#"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="profile.html"><i class="fas fa-user"></i> My Account</a></li>
+            <li><a href="cart.html"><i class="fas fa-shopping-cart"></i> Cart</a></li>
+          </ul>
+        </div>
+
+        <!-- Customer Service -->
+        <div class="footer-section">
+          <h3>Customer Service</h3>
+          <ul class="footer-links">
+            <li><a href="#"><i class="fas fa-question-circle"></i> Help Center</a></li>
+            <li><a href="#"><i class="fas fa-truck"></i> Shipping Info</a></li>
+            <li><a href="#"><i class="fas fa-undo"></i> Returns & Exchanges</a></li>
+            <li><a href="#"><i class="fas fa-shield-alt"></i> Privacy Policy</a></li>
+            <li><a href="#"><i class="fas fa-headset"></i> Contact Support</a></li>
+          </ul>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="footer-section">
+          <h3>Get In Touch</h3>
+          <ul class="contact-info">
+            <li>
+              <i class="fas fa-map-marker-alt"></i>
+              <span>Taguig, Metro Manila, Philippines</span>
+            </li>
+            <li>
+              <i class="fas fa-phone"></i>
+              <span>+63 9755823240</span>
+            </li>
+            <li>
+              <i class="fas fa-envelope"></i>
+              <span>romeros23@romeroskingdom.com</span>
+            </li>
+            <li>
+              <i class="fas fa-clock"></i>
+              <span>Mon - Sat: 9:00 AM - 8:00 PM</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Footer Bottom -->
+      <div class="footer-bottom">
+        <div class="footer-bottom-content">
+          <div class="copyright">
+            <p>&copy; 2025 ROMEROS KINGDOM. All rights reserved.</p>
+          </div>
+          <div class="footer-bottom-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Cookie Policy</a>
+            <a href="#">Sitemap</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Product Details Modal with Enhanced Image Gallery -->
+  <div class="modal fade" id="productDetailsModal" tabindex="-1" aria-labelledby="productDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="productDetailsModalLabel"></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="modal-image-gallery">
+                <div class="modal-image-container" id="modalImageContainer">
+                  <!-- Modal images will be inserted here -->
+                </div>
+                <button class="modal-gallery-arrow prev" id="modalPrevBtn">
+                  <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="modal-gallery-arrow next" id="modalNextBtn">
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+                <div class="modal-gallery-nav" id="modalGalleryNav">
+                  <!-- Modal navigation dots will be inserted here -->
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <h4 id="modalProductName"></h4>
+                <p class="product-description" id="modalProductDescription"></p>
+              </div>
+              <div class="d-flex justify-content-between mb-3">
+                <div>
+                  <span class="badge bg-purple" id="modalProductCategory"></span>
+                </div>
+                <div>
+                  <span class="text-muted">Stock: </span>
+                  <span id="modalProductStock"></span>
+                </div>
+              </div>
+              <div class="mb-4">
+                <h3 class="text-purple" id="modalProductPrice"></h3>
+              </div>
+              <div class="input-group mb-3">
+                <input type="number" class="form-control" id="modalQuantityInput" min="1" value="1">
+                <button class="btn btn-primary" type="button" id="modalAddToCart">
+                  <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Reviews Section -->
+          <div class="mt-5">
+            <h5 class="reviews-title">Customer Reviews</h5>
+            <div id="productReviews" class="reviews-container">
+              <div class="review-images-container mt-2" data-review-id="${review.id}"></div>
+            </div>
+            <div id="noReviewsMessage" class="no-reviews">
+              No reviews yet. Be the first to review this product!
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    $(function () {
+      $("#header").load("header.html");
+    });
+
+    $(document).ready(function () {
+      const url = 'http://localhost:3000/';
+      const imageBaseUrl = 'http://localhost:3000/uploads/reviews/'; 
+      var itemCount = 0;
+      var currentCategory = 'all';
+      const productModal = new bootstrap.Modal(document.getElementById('productDetailsModal'));
+
+      const getCart = () => {
+          let cart = localStorage.getItem('cart');
+          return cart ? JSON.parse(cart) : [];
+      }
+
+      const saveCart = (cart) => {
+          localStorage.setItem('cart', JSON.stringify(cart));
+      }
+
+      const isUserLoggedIn = () => {
+          const token = localStorage.getItem('token');
+          const userId = localStorage.getItem('userId');
+          return token && userId;
+      }
+
+      // Image Gallery Management
+      class ImageGallery {
+        constructor(container, images, isModal = false) {
+          this.container = container;
+          this.images = images;
+          this.currentIndex = 0;
+          this.isModal = isModal;
+          this.init();
+        }
+
+        init() {
+          this.createImageElements();
+          this.createNavigation();
+          this.bindEvents();
+          this.showImage(0);
+          this.startAutoRotate();
+        }
+
+        createImageElements() {
+          const imageContainer = this.isModal ? 
+            this.container.find('.modal-image-container') : 
+            this.container.find('.product-image-container');
+          
+          imageContainer.empty();
+          
+          this.images.forEach((image, index) => {
+            const imgElement = `
+              <div class="product-image ${index === 0 ? 'active' : ''}">
+                <img src="${imageBaseUrl}${image}" alt="Product Image ${index + 1}" 
+                     onerror="this.src='${imageBaseUrl}placeholder.jpg'; this.onerror=null;">
+              </div>
+            `;
+            imageContainer.append(imgElement);
+          });
+        }
+
+        createNavigation() {
+          // Create dots
+          const navContainer = this.isModal ? 
+            this.container.find('.modal-gallery-nav') : 
+            this.container.find('.gallery-nav');
+          
+          navContainer.empty();
+          
+          this.images.forEach((_, index) => {
+            const dotClass = this.isModal ? 'modal-gallery-dot' : 'gallery-dot';
+            const dot = `<div class="${dotClass} ${index === 0 ? 'active' : ''}" data-index="${index}"></div>`;
+            navContainer.append(dot);
+          });
+
+          // Add image counter for card view
+          if (!this.isModal) {
+            const counter = `<div class="image-counter">1 / ${this.images.length}</div>`;
+            this.container.find('.product-image-gallery').append(counter);
+          }
+        }
+
+        bindEvents() {
+          const self = this;
+          const prefix = this.isModal ? '.modal-gallery' : '.gallery';
+          
+          // Arrow navigation
+          this.container.on('click', `${prefix}-arrow.prev`, () => {
+            this.prevImage();
+          });
+
+          this.container.on('click', `${prefix}-arrow.next`, () => {
+            this.nextImage();
+          });
+
+          // Dot navigation
+          const dotClass = this.isModal ? '.modal-gallery-dot' : '.gallery-dot';
+          this.container.on('click', dotClass, function() {
+            const index = parseInt($(this).data('index'));
+            self.showImage(index);
+          });
+
+          // Pause auto-rotate on hover
+          if (!this.isModal) {
+            this.container.hover(
+              () => this.pauseAutoRotate(),
+              () => this.startAutoRotate()
+            );
+          }
+        }
+
+        showImage(index) {
+          const imageElements = this.isModal ? 
+            this.container.find('.modal-image-container .product-image') :
+            this.container.find('.product-image-container .product-image');
+          
+          const dotElements = this.isModal ?
+            this.container.find('.modal-gallery-dot') :
+            this.container.find('.gallery-dot');
+
+          // Hide all images and show selected
+          imageElements.removeClass('active');
+          imageElements.eq(index).addClass('active');
+
+          // Update dots
+          dotElements.removeClass('active');
+          dotElements.eq(index).addClass('active');
+
+          // Update counter for card view
+          if (!this.isModal) {
+            this.container.find('.image-counter').text(`${index + 1} / ${this.images.length}`);
+          }
+
+          this.currentIndex = index;
+        }
+
+        nextImage() {
+          const nextIndex = (this.currentIndex + 1) % this.images.length;
+          this.showImage(nextIndex);
+        }
+
+        prevImage() {
+          const prevIndex = (this.currentIndex - 1 + this.images.length) % this.images.length;
+          this.showImage(prevIndex);
+        }
+
+        startAutoRotate() {
+          if (this.isModal || this.images.length <= 1) return;
+          
+          this.autoRotateInterval = setInterval(() => {
+            this.nextImage();
+          }, 4000); // Change image every 4 seconds
+        }
+
+        pauseAutoRotate() {
+          if (this.autoRotateInterval) {
+            clearInterval(this.autoRotateInterval);
+            this.autoRotateInterval = null;
+          }
+        }
+
+        destroy() {
+          this.pauseAutoRotate();
+          this.container.off('click');
+        }
+      }
+
+    // Function to load reviews for a specific product
+function loadReviews(itemId) {
+    $.ajax({
+        method: "GET",
+        url: `${url}api/reviews`,
+        data: { item_id: itemId },
+        dataType: 'json',
+        success: function (response) {
+            console.log("Reviews API Response:", response);
+            $('#productReviews').empty();
+            
+            if (response.data && Array.isArray(response.data)) {
+                if (response.data.length > 0) {
+                    $('#noReviewsMessage').hide();
+                    
+                    // Process each review
+                    $.each(response.data, function (key, review) {
+                        try {
+                            // Only show reviews that match the current item_id
+                            if (review.item_id == itemId) {
+                                const reviewDate = new Date(review.created_at).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric'
+                                });
+                                
+                                // Create unique ID for this review's image container
+                                const reviewImageContainerId = `review-images-${review.review_id || review.id}`;
+                                
+                                // Build the review element
+                                let reviewElement = `
+                                    <div class="card review-card mb-3" data-review-id="${review.review_id || review.id}">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <div>
+                                                    <span class="review-author">${review.customer_name || 'Anonymous'}</span>
+                                                    <div class="rating">
+                                                        ${getStarRating(review.rating)}
+                                                    </div>
+                                                </div>
+                                                <span class="review-date">${reviewDate}</span>
+                                            </div>
+                                            <div class="review-text">
+                                                ${review.review_text ? `<p>${review.review_text}</p>` : '<p class="text-muted">No review text provided</p>'}
+                                            </div>
+                                            <div class="review-images-container mt-3" id="${reviewImageContainerId}">
+                                                <div class="text-muted small">Loading images...</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                                
+                                $('#productReviews').append(reviewElement);
+                                
+                                // Fetch images for this review after DOM element is added
+                                fetchReviewImages(review.review_id || review.id, reviewImageContainerId);
+                            }
+                        } catch (e) {
+                            console.error("Error processing review:", review, e);
+                        }
+                    });
+                } else {
+                    $('#noReviewsMessage').show();
+                }
+            } else {
+                console.error("Unexpected reviews response format:", response);
+                $('#noReviewsMessage').show().text("Error loading reviews. Invalid data format.");
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Error loading reviews:", error);
+            $('#noReviewsMessage').show().text("Error loading reviews. Please try again later.");
+        }
+    });
+}
+
+// Function to fetch images for a specific review
+function fetchReviewImages(reviewId, containerId) {
+    const baseUrl = 'http://localhost:3000';
+    const uploadsBasePath = 'uploads/reviews';
+
+    // Clear container and show loading state
+    const $container = $(`#${containerId}`);
+    $container.html('<div class="text-muted small">Loading images...</div>');
+
+    $.ajax({
+        method: "GET",
+        url: `${baseUrl}/api/reviews/${reviewId}/images`,
+        dataType: 'json',
+        success: function(response) {
+            console.log(`Review images response for review ${reviewId}:`, response);
+
+            if (response.success && Array.isArray(response.data) && response.data.length > 0) {
+                let imagesHTML = '<div class="d-flex flex-wrap gap-2">';
+
+                $.each(response.data, function(index, image) {
+                    if (image.image_path) {
+                        // Clean up the image path - remove any leading/trailing slashes
+                        let cleanPath = image.image_path.replace(/^\/|\/$/g, '');
+                        
+                        // If image_path already includes 'uploads/reviews/', don't prepend again
+                        const fullImagePath = cleanPath.startsWith('uploads/reviews/')
+                            ? `${baseUrl}/${cleanPath}`
+                            : `${baseUrl}/${uploadsBasePath}/${cleanPath}`;
+                        
+                        const imageId = image.reviewimg_id || index;
+                        const uploadedAt = image.created_at ? 
+                            new Date(image.created_at).toLocaleString() : 
+                            'Unknown date';
+
+                        imagesHTML += `
+                            <div class="review-image-container position-relative" data-image-id="${imageId}">
+                                <a href="${fullImagePath}" 
+                                   target="_blank" 
+                                   class="review-image-thumbnail d-block"
+                                   title="Uploaded: ${uploadedAt}"
+                                   data-fancybox="review-gallery-${reviewId}"
+                                   data-caption="Review image ${index + 1}">
+                                    <img src="${fullImagePath}" 
+                                         alt="Review image ${index + 1}" 
+                                         class="img-thumbnail" 
+                                         style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;"
+                                         onerror="this.onerror=null;this.src='${baseUrl}/images/image-not-found.png'">
+                                </a>
+                            </div>
+                        `;
+                    }
+                });
+
+                imagesHTML += '</div>';
+                $container.html(imagesHTML);
+
+                // Initialize fancybox if available
+                if (typeof $.fancybox !== 'undefined') {
+                    $(`[data-fancybox="review-gallery-${reviewId}"]`).fancybox();
+                }
+                
+            } else {
+                $container.html('<div class="text-muted small">No images available.</div>');
+                console.log(`No images found for review ${reviewId}`);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error(`Error loading review images for review ${reviewId}:`, error);
+            console.error('Status:', status);
+            console.error('Response:', xhr.responseText);
+            
+            $container.html(`
+                <div class="alert alert-danger small">
+                    Error loading images. ${xhr.responseJSON?.message || 'Please try again later.'}
+                </div>
+            `);
+        }
+    });
+}
+
+// Helper function to generate star rating
+function getStarRating(rating) {
+    if (!rating) return '';
+    let stars = '';
+    const numRating = parseInt(rating);
+    for (let i = 1; i <= 5; i++) {
+        if (i <= numRating) {
+            stars += '<i class="fas fa-star text-warning"></i>';
+        } else {
+            stars += '<i class="far fa-star text-warning"></i>';
+        }
+    }
+    return stars;
+}
+
+      // Load categories
+      function loadCategories() {
+          $.ajax({
+              method: "GET",
+              url: `${url}api/category`,
+              dataType: 'json',
+              success: function (response) {
+                  $('#categoryFilter').empty();
+                  $('#categoryFilter').append(`
+                      <button class="category-btn active" data-category="all">All Categories</button>
+                  `);
+                  
+                  if (response.data && Array.isArray(response.data)) {
+                      $.each(response.data, function (key, category) {
+                          $('#categoryFilter').append(`
+                              <button class="category-btn" data-category="${category.category_id}">
+                                  ${category.description || 'Unnamed Category'}
+                              </button>
+                          `);
+                      });
+                  } else {
+                      console.error("Unexpected categories response format:", response);
+                  }
+              },
+              error: function (xhr, status, error) {
+                  console.error("Error loading categories:", error);
+                  $('#categoryFilter').html('<p class="text-danger">Failed to load categories. Please try again later.</p>');
+              }
+          });
+      }
+
+      // Load items with category filtering
+     function loadItems(category = 'all') {
+    let apiUrl = `${url}api/item`;
+    if (category !== 'all') {
+        apiUrl += `?category=${category}`;
+    }
+
+    $.ajax({
+        method: "GET",
+        url: apiUrl,
+        dataType: 'json',
+        success: function (response) {
+            $(".products-grid-container").empty();
+
+            // Check if response has 'rows' or if it's directly an array
+            const items = response.rows || response.data || response;
+            
+            if (!Array.isArray(items)) {
+                console.error("Unexpected items response format:", response);
+                return;
+            }
+
+            $.ajax({
+                method: "GET",
+                url: `${url}api/category`,
+                dataType: 'json',
+                success: function (categoriesResponse) {
+                    const categories = categoriesResponse.data || categoriesResponse;
+                    
+                    $.each(items, function (key, item) {
+                        // Find the category for this item
+                        let categoryName = 'Uncategorized';
+                        let categoryId = null;
+                        
+                        if (item.category_id) {
+                            const category = categories.find(c => c.category_id == item.category_id);
+                            if (category) {
+                                categoryName = category.description || 'Uncategorized';
+                                categoryId = category.category_id;
+                            }
+                        }
+
+                        // Ensure we have a proper item object
+                        if (!item) return;
+                        
+                        // Handle images - use images array if available, otherwise fall back to single image
+                        const productImages = item.images && item.images.length > 0 ? 
+                            item.images : 
+                            (item.image ? [item.image] : ['placeholder.jpg']);
+                        
+                        const itemCard = `
+                        <div class="product-card" data-id="${item.item_id}">
+                            <div class="product-image-gallery">
+                                <div class="product-image-container">
+                                    <!-- Images will be inserted by ImageGallery class -->
+                                </div>
+                                <button class="gallery-arrow prev">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <button class="gallery-arrow next">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                                <div class="gallery-nav">
+                                    <!-- Navigation dots will be inserted here -->
+                                </div>
+                            </div>
+                            <div class="product-info">
+                                <span class="product-category">${categoryName}</span>
+                                <h3 class="product-name">${item.item_name}</h3>
+                                <div class="product-price">₱${item.sell_price}</div>
+                                <div class="product-stock">Stock: ${item.quantity ?? 0}</div>
+                                <div class="product-actions">
+                                    <div class="quantity-selector">
+                                        <input type="number" class="quantity-input" min="1" max="${item.quantity ?? 1}" value="1">
+                                    </div>
+                                    <div class="action-buttons">
+                                        <button class="btn-add-cart add-to-cart" 
+                                            data-id="${item.item_id}"
+                                            data-name="${item.item_name}"
+                                            data-price="${item.sell_price}"
+                                            data-image="${item.image || productImages[0]}"
+                                            data-stock="${item.quantity ?? 0}"
+                                            data-category="${categoryId}">
+                                            <i class="fas fa-shopping-cart"></i>
+                                            Add to Cart
+                                        </button>
+                                        <button class="btn-view-details view-details" 
+                                            data-id="${item.item_id}"
+                                            data-name="${item.item_name}"
+                                            data-description="${item.description || 'No description available'}"
+                                            data-price="${item.sell_price}"
+                                            data-image="${item.image || productImages[0]}"
+                                            data-stock="${item.quantity ?? 0}"
+                                            data-category="${categoryName}"
+                                            data-images='${JSON.stringify(productImages)}'>
+                                            <i class="fas fa-info-circle"></i>
+                                            Details
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                        
+                        $(".products-grid-container").append(itemCard);
+                        
+                        // Initialize image gallery for this product card
+                        const $card = $(`.product-card[data-id="${item.item_id}"]`);
+                        new ImageGallery($card, productImages, false);
+                    });
+                },
+                error: function (error) {
+                    console.error("Error loading categories:", error);
+                }
+            });
+        },
+        error: function (error) {
+            console.error("Error loading items:", error);
+            $(".products-grid-container").html('<p class="text-danger text-center">Failed to load products. Please try again later.</p>');
+        }
+    });
+}
+
+      // Store modal gallery instance
+      let modalGallery = null;
+
+      // Show product details in modal
+      $(document).on('click', '.view-details', function() {
+          const id = $(this).data('id');
+          const name = $(this).data('name');
+          const description = $(this).data('description');
+          const price = $(this).data('price');
+          const image = $(this).data('image');
+          const stock = $(this).data('stock');
+          const category = $(this).data('category') || 'Uncategorized'; // Ensure we have a fallback
+          const images = $(this).data('images') || [image];
+
+          $('#productDetailsModalLabel').text(name).data('id', id);
+          $('#modalProductName').text(name);
+          $('#modalProductDescription').text(description);
+          $('#modalProductCategory').text(category);
+          $('#modalProductPrice').text(`₱${price}`);
+          $('#modalProductStock').text(stock);
+          $('#modalQuantityInput').attr('max', stock).val(1);
+          
+          // Clean up previous modal gallery
+          if (modalGallery) {
+              modalGallery.destroy();
+          }
+          
+          // Initialize modal image gallery
+          const $modal = $('#productDetailsModal');
+          modalGallery = new ImageGallery($modal, images, true);
+          
+          // Load reviews for this specific product
+          loadReviews(id);
+
+          productModal.show();
+      });
+
+      // Add to cart from modal
+      $(document).on('click', '#modalAddToCart', function() {
+          const qty = parseInt($('#modalQuantityInput').val());
+          const id = $('#productDetailsModalLabel').data('id');
+          const name = $('#modalProductName').text();
+          const price = parseFloat($('#modalProductPrice').text().replace('₱', ''));
+          const image = $('#modalImageContainer .product-image.active img').attr('src').replace(imageBaseUrl, '');
+          const stock = parseInt($('#modalProductStock').text());
+          
+          if (!isUserLoggedIn()) {
+              alert('Please sign in to add items to your cart');
+              window.location.href = 'login.html';
+              return;
+          }
+
+          let cart = getCart();
+          let existing = cart.find(item => item.item_id == id);
+
+          if (existing) {
+              if ((existing.quantity + qty) > stock) {
+                  alert(`You can't add more than available stock (${stock})`);
+                  return;
+              }
+              existing.quantity += qty;
+          } else {
+              cart.push({
+                  item_id: id,
+                  name,
+                  price,
+                  image,
+                  stock,
+                  quantity: qty
+              });
+          }
+
+          saveCart(cart);
+          itemCount = cart.reduce((total, item) => total + item.quantity, 0);
+          $('#itemCount').text(itemCount).css('display', 'block');
+          alert(`${name} added to cart!`);
+          productModal.hide();
+      });
+
+      // Add to cart from grid
+      $(document).on('click', '.add-to-cart', function (e) {
+          e.stopPropagation();
+          
+          if (!isUserLoggedIn()) {
+              alert('Please sign in to add items to your cart');
+              window.location.href = 'login.html';
+              return;
+          }
+
+          const $productCard = $(this).closest('.product-card');
+          const qty = parseInt($productCard.find('.quantity-input').val());
+          const id = $(this).data('id');
+          const name = $(this).data('name');
+          const price = parseFloat($(this).data('price'));
+          const image = $(this).data('image');
+          const stock = parseInt($(this).data('stock'));
+          const category = $(this).data('category');
+
+          let cart = getCart();
+          let existing = cart.find(item => item.item_id == id);
+
+          if (existing) {
+              if ((existing.quantity + qty) > stock) {
+                  alert(`You can't add more than available stock (${stock})`);
+                  return;
+              }
+              existing.quantity += qty;
+          } else {
+              cart.push({
+                  item_id: id,
+                  name,
+                  price,
+                  image,
+                  stock,
+                  category,
+                  quantity: qty
+              });
+          }
+
+          saveCart(cart);
+          itemCount = cart.reduce((total, item) => total + item.quantity, 0);
+          $('#itemCount').text(itemCount).css('display', 'block');
+          alert(`${name} added to cart!`);
+      });
+
+      // Category filter click handler
+      $(document).on('click', '.category-btn', function() {
+          const category = $(this).data('category');
+          currentCategory = category;
+          
+          $('.category-btn').removeClass('active');
+          $(this).addClass('active');
+          
+          loadItems(category);
+      });
+
+      // Clean up modal gallery when modal closes
+      $('#productDetailsModal').on('hidden.bs.modal', function() {
+          if (modalGallery) {
+              modalGallery.destroy();
+              modalGallery = null;
+          }
+      });
+
+      // Newsletter subscription handler
+      $('.newsletter-form').on('submit', function(e) {
+          e.preventDefault();
+          const email = $(this).find('input[type="email"]').val();
+          
+          if (email) {
+              // Here you would typically send the email to your backend
+              alert('Thank you for subscribing to our newsletter!');
+              $(this).find('input[type="email"]').val('');
+          }
+      });
+
+      // Initialize cart count
+     const cart = getCart();
+itemCount = cart.reduce((total, item) => total + item.quantity, 0);
+$('#itemCount').text(itemCount).toggle(itemCount > 0);
+
+      // Initial load
+      loadCategories();
+      loadItems();
+    });
+  </script>
+</body>
+</html>
