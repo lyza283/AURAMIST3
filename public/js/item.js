@@ -48,7 +48,18 @@ $(document).ready(function () {
   // Add authorization header to all AJAX requests
   $.ajaxSetup({
     beforeSend: function (xhr) {
-      const token = localStorage.getItem('token');
+      let token = localStorage.getItem('token');
+
+      // Fallback: try to read token from cookies if localStorage is unavailable (tracking prevention)
+      if (!token && document.cookie) {
+        const m = document.cookie.match(/(?:^|;\s*)(?:token|authToken)=([^;]+)/);
+        if (m && m[1]) {
+          token = decodeURIComponent(m[1]);
+          if (window.DEBUG_CLIENT_AUTH) console.log('Found auth token in cookie');
+        }
+      }
+
+      if (window.DEBUG_CLIENT_AUTH) console.log('AJAX beforeSend token present:', !!token, token ? token.substr(0, 10) + '...' : null);
       if (token) {
         xhr.setRequestHeader('Authorization', `Bearer ${token}`);
       }
@@ -75,6 +86,12 @@ $(document).ready(function () {
   });
 
   // Load categories
+  if (window.DEBUG_CLIENT_AUTH) console.log('Initial client auth state:', {
+    token: localStorage.getItem('token') ? 'present' : 'missing',
+    userRole: localStorage.getItem('userRole'),
+    cookies: document.cookie ? 'present' : 'none'
+  });
+
   $.get(categoryUrl, function (res) {
     if (res.success) {
       $('#category').empty();

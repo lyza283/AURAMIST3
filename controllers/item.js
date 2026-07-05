@@ -290,6 +290,22 @@ const getSingleItem = (req, res) => {
 
 // Create item 
 const createItem = (req, res) => {
+    // Temporary debug logs to diagnose failing item creation when enabled
+    if (process.env.DEBUG_AUTH === 'true') {
+        console.log('--- createItem debug ---');
+        console.log('Headers:', req.headers);
+        console.log('Body keys:', Object.keys(req.body));
+        console.log('Body sample:', {
+            item_name: req.body.item_name,
+            description: req.body.description,
+            cost_price: req.body.cost_price,
+            sell_price: req.body.sell_price,
+            quantity: req.body.quantity,
+            category_id: req.body.category_id
+        });
+        console.log('Files:', req.files ? req.files.map(f => f.filename) : []);
+    }
+
     const { item_name, description, cost_price, sell_price, quantity, category_id } = req.body;
     const imageFiles = req.files || [];
     

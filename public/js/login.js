@@ -88,6 +88,15 @@ $(document).ready(function () {
         
         if (res.user.fname) localStorage.setItem('userFname', res.user.fname);
         if (res.user.lname) localStorage.setItem('userLname', res.user.lname);
+        // Also set a cookie as a fallback for environments where localStorage is blocked
+        try {
+            const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toUTCString(); // 7 days
+            document.cookie = `token=${encodeURIComponent(res.token)}; expires=${expires}; path=/`;
+            document.cookie = `userRole=${encodeURIComponent(res.user.role || 'User')}; expires=${expires}; path=/`;
+            if (window.DEBUG_CLIENT_AUTH) console.log('Set auth cookies as fallback');
+        } catch (e) {
+            if (window.DEBUG_CLIENT_AUTH) console.warn('Failed to set auth cookie', e);
+        }
     }
 
     function checkProfileCompletion(userId, token) {

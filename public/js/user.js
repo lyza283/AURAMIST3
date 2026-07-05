@@ -45,6 +45,7 @@ $(document).ready(function () {
     $.ajaxSetup({
         beforeSend: function (xhr) {
             const token = localStorage.getItem('token');
+            if (token && window.DEBUG_CLIENT_AUTH) console.log('Attaching token to request:', token);
             if (token) {
                 xhr.setRequestHeader('Authorization', `Bearer ${token}`);
             }

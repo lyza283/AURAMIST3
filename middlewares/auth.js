@@ -2,17 +2,34 @@ const jwt = require("jsonwebtoken");
 
 exports.isAuthenticatedUser = (req, res, next) => {
     try {
-        // Check for Authorization header
-        const authHeader = req.header('Authorization');
-        if (!authHeader) {
-            return res.status(401).json({ 
-                success: false,
-                message: 'Please login to access this resource' 
-            });
+        // Optional debug logging controlled by env var
+        if (process.env.DEBUG_AUTH === 'true') {
+            console.log('Auth check - Authorization header:', req.header('Authorization'));
+            console.log('Auth check - cookies:', req.headers.cookie);
         }
+        // Check for Authorization header
+            // Check for Authorization header
+            let authHeader = req.header('Authorization');
 
-        // Extract token
-        const token = authHeader.split(' ')[1];
+            // If header missing, try to read token from cookies (fallback for tracking-prevention cases)
+            if (!authHeader && req.headers && req.headers.cookie) {
+                const m = req.headers.cookie.match(/(?:^|;\s*)(?:token|authToken)=([^;]+)/);
+                if (m && m[1]) {
+                    const cookieToken = decodeURIComponent(m[1]);
+                    authHeader = `Bearer ${cookieToken}`;
+                    if (process.env.DEBUG_AUTH === 'true') console.log('Auth token extracted from cookie fallback');
+                }
+            }
+
+            if (!authHeader) {
+                return res.status(401).json({ 
+                    success: false,
+                    message: 'Please login to access this resource' 
+                });
+            }
+
+            // Extract token
+            const token = authHeader.split(' ')[1];
         if (!token) {
             return res.status(401).json({ 
                 success: false,
