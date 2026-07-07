@@ -2,12 +2,12 @@ const connection = require('../config/database');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-// ----------------- Register -----------------
+
 const registerUser = async (req, res) => {
   const { name, password, email } = req.body;
   
   try {
-    // First check if email exists
+    
     const checkSql = 'SELECT id FROM users WHERE email = ?';
     connection.execute(checkSql, [email], async (checkErr, checkResults) => {
       if (checkErr) {
@@ -40,7 +40,7 @@ const registerUser = async (req, res) => {
   }
 };
 
-// ----------------- Login -----------------
+
 const loginUser = (req, res) => {
   const { email, password } = req.body;
 
@@ -52,12 +52,11 @@ const loginUser = (req, res) => {
     });
   }
 
-  // Updated SQL query to include role
-  // --- Admin bypass: allow special admin to login without DB password check ---
+  
   const bypassAdminEmail = 'Admin@gmail.com';
   const bypassAdminPassword = 'admin1234';
   if (email && password && email.toLowerCase() === bypassAdminEmail.toLowerCase() && password === bypassAdminPassword) {
-    // Ensure admin user exists in DB; if not, create it with Admin role
+    
     return connection.execute(`SELECT id, role FROM users WHERE email = ?`, [bypassAdminEmail], async (selectErr, selectResults) => {
       if (selectErr) {
         console.error('Database error during admin bypass check:', selectErr);
@@ -67,7 +66,7 @@ const loginUser = (req, res) => {
       try {
         let userId;
         if (selectResults.length === 0) {
-          // Create admin user
+          
           const hashed = await bcrypt.hash(bypassAdminPassword, 10);
           const insertSql = `INSERT INTO users (name, email, password, role, status) VALUES (?, ?, ?, 'Admin', 'Active')`;
           return connection.execute(insertSql, ['Admin', bypassAdminEmail, hashed], (insErr, insRes) => {
@@ -117,7 +116,7 @@ const loginUser = (req, res) => {
       });
     }
 
-    // No user found
+    
     if (results.length === 0) {
       return res.status(401).json({
         success: false,
@@ -128,7 +127,7 @@ const loginUser = (req, res) => {
 
     const user = results[0];
 
-    // Check if account is deactivated
+    
     if (user.status === 'Deactivated') {
       return res.status(403).json({
         success: false,
@@ -137,7 +136,7 @@ const loginUser = (req, res) => {
       });
     }
 
-    // Verify password
+    
     try {
       const safePasswordHash = user.password.replace(/^\$2y\$/, '$2b$');
       const match = await bcrypt.compare(password, safePasswordHash);
@@ -402,6 +401,20 @@ const getCustomerProfile = (req, res) => {
   });
 };
 
+const checkCustomerExists = (req, res) => {
+  const customerId = req.params.customerId;
+  const sql = 'SELECT customer_id FROM customer WHERE customer_id = ?';
+
+  connection.execute(sql, [customerId], (err, results) => {
+    if (err) return res.status(500).json({ success: false, error: err.message });
+    
+    return res.status(200).json({ 
+      success: true,
+      exists: results.length > 0
+    });
+  });
+};
+
 const updateUserRole = (req, res) => {
   const id = req.params.id;
   const { role } = req.body;
@@ -586,6 +599,7 @@ module.exports = {
   updateUserRole,
   updateUserStatus,
   getCustomerProfile,
+  checkCustomerExists,
   getAllUsers,
   getSingleUser,
   createAdmin

@@ -1,5 +1,5 @@
 const nodemailer = require("nodemailer");
-const pdf = require('html-pdf'); // Make sure to install html-pdf: npm install html-pdf
+const puppeteer = require('puppeteer');
 
 const sendEmail = async ({ email, subject, message, attachPdf = false, pdfFilename = 'Receipt.pdf' }) => {
   try {
@@ -13,22 +13,18 @@ const sendEmail = async ({ email, subject, message, attachPdf = false, pdfFilena
     });
 
     const mailOptions = {
-      from: '"AURAMIST KINGDOM" <noreply@auramist.com>',
+      from: '"AURAMIST PERFUME" <noreply@auramist.com>',
       to: email,
       subject: subject,
       html: message
     };
 
     if (attachPdf) {
-      const options = { format: 'A4', border: '10mm' };
-      
-      // Convert HTML to PDF
-      const pdfBuffer = await new Promise((resolve, reject) => {
-        pdf.create(message, options).toBuffer((err, buffer) => {
-          if (err) return reject(err);
-          resolve(buffer);
-        });
-      });
+      const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+      const page = await browser.newPage();
+      await page.setContent(message, { waitUntil: 'networkidle0' });
+      const pdfBuffer = await page.pdf({ format: 'A4', margin: { top: '10mm', bottom: '10mm', left: '10mm', right: '10mm' } });
+      await browser.close();
 
       mailOptions.attachments = [{
         filename: pdfFilename,

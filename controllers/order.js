@@ -186,7 +186,7 @@ const sendOrderConfirmationEmailAsync = async (orderinfo_id, customer_id, shippi
 
     const message = `
       <h3>Hi ${fullName || 'Customer'},</h3>
-      <p>Thank you for placing your order with AURAMIST KINGDOM!</p>
+      <p>Thank you for placing your order with AURAMIST PERFUME!</p>
       <p><strong>Order ID:</strong> ${orderinfo_id}</p>
       <p><strong>Date Placed:</strong> ${new Date(date_placed).toLocaleDateString()}</p>
 
@@ -205,7 +205,7 @@ const sendOrderConfirmationEmailAsync = async (orderinfo_id, customer_id, shippi
 
     await sendEmailAsync({
       email,
-      subject: `AURAMIST KINGDOM Order #${orderinfo_id} Confirmation`,
+      subject: `AURAMIST PERFUME Order #${orderinfo_id} Confirmation`,
       message,
       attachPdf: true,
       pdfFilename: `Order_${orderinfo_id}_Receipt.pdf`
@@ -227,14 +227,9 @@ const queryAsync = (sql, params) => {
   });
 };
 
-// Helper function to promisify email sending
+// Helper function to send email using async sendEmail
 const sendEmailAsync = (emailOptions) => {
-  return new Promise((resolve, reject) => {
-    sendEmail(emailOptions, (err) => {
-      if (err) reject(err);
-      else resolve();
-    });
-  });
+  return sendEmail(emailOptions);
 };
 
 const getOrdersByCustomer = (req, res) => {
@@ -572,12 +567,12 @@ const sendOrderStatusUpdateEmailAsync = async (orderId, status) => {
       <p><strong>Shipping:</strong> ${region} - ₱${parseFloat(rate).toFixed(2)}</p>
       <p><strong>Total:</strong> ₱${total}</p>
 
-      <br><p>Thank you for shopping at AURAMIST KINGDOM!</p>
+      <br><p>Thank you for shopping at AURAMIST PERFUME!</p>
     `;
 
     await sendEmailAsync({
       email,
-      subject: `AURAMIST KINGDOM Order #${orderId} Status Update: ${status}`,
+      subject: `AURAMIST PERFUME Order #${orderId} Status Update: ${status}`,
       message,
       attachPdf: true
     });

@@ -402,7 +402,7 @@ $(document).ready(function () {
             if (result.isConfirmed) {
                 // First verify customer exists
                 $.ajax({
-                    url: `${API_BASE_URL}/api/customers/${customerId}/exists`,
+                    url: `${API_BASE_URL}/api/users/customers/${customerId}/exists`,
                     method: 'GET',
                     success: function(existsResponse) {
                         if (!existsResponse.exists) {
@@ -416,8 +416,8 @@ $(document).ready(function () {
 
                         // Proceed with deletion
                         $.ajax({
-                            url: `${API_BASE_URL}/api/reviews/${reviewId}`,
-                            method: 'DELETE',
+                            url: `${API_BASE_URL}/api/reviews/delete/${reviewId}`,
+                            method: 'PUT',
                             success: function (response) {
                                 if (response.success) {
                                     Swal.fire(
@@ -467,7 +467,7 @@ $(document).ready(function () {
             if (result.isConfirmed) {
                 // First verify customer exists
                 $.ajax({
-                    url: `${API_BASE_URL}/api/customers/${customerId}/exists`,
+                    url: `${API_BASE_URL}/api/users/customers/${customerId}/exists`,
                     method: 'GET',
                     success: function(existsResponse) {
                         if (!existsResponse.exists) {
@@ -481,7 +481,7 @@ $(document).ready(function () {
 
                         // Proceed with restoration
                         $.ajax({
-                            url: `${API_BASE_URL}/api/reviews/${reviewId}/restore`,
+                            url: `${API_BASE_URL}/api/reviews/restore/${reviewId}`,
                             method: 'PATCH',
                             success: function (response) {
                                 if (response.success) {
