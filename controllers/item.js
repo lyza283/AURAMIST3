@@ -288,7 +288,7 @@ const getSingleItem = (req, res) => {
     });
 };
 
-// Create item 
+
 const createItem = (req, res) => {
     // Temporary debug logs to diagnose failing item creation when enabled
     if (process.env.DEBUG_AUTH === 'true') {
@@ -343,7 +343,7 @@ const createItem = (req, res) => {
     });
 };
 
-// Update item
+
 const updateItem = (req, res) => {
     const itemId = req.params.id;
     const { item_name, description, cost_price, sell_price, quantity, category_id } = req.body;
@@ -384,7 +384,7 @@ const updateItem = (req, res) => {
     });
 };
 
-// Soft delete item
+
 const softDeleteItem = (req, res) => {
     const itemId = req.params.id;
     const sql = `UPDATE item SET deleted_at = NOW() WHERE item_id = ?`;
@@ -395,7 +395,7 @@ const softDeleteItem = (req, res) => {
     });
 };
 
-// Restore item
+
 const restoreItem = (req, res) => {
     const itemId = req.params.id;
     const sql = `UPDATE item SET deleted_at = NULL WHERE item_id = ?`;
@@ -406,7 +406,7 @@ const restoreItem = (req, res) => {
     });
 };
 
-// Get all items including deleted
+
 const getAllItemsIncludingDeleted = (req, res) => {
     const sql = `
         SELECT 
@@ -427,11 +427,11 @@ const getAllItemsIncludingDeleted = (req, res) => {
     db.query(sql, (err, rows) => {
         if (err) return res.status(500).json({ error: 'Database error', details: err });
 
-        // Get all images
+       
         db.query(imagesSql, (err, images) => {
             if (err) return res.status(500).json({ error: 'Database error fetching images', details: err });
 
-            // Group images by item_id
+           
             const imagesByItem = images.reduce((acc, image) => {
                 if (!acc[image.item_id]) {
                     acc[image.item_id] = [];
@@ -454,7 +454,7 @@ const getAllItemsIncludingDeleted = (req, res) => {
     });
 };
 
-// Search items by name 
+
 const searchItems = (req, res) => {
     const { term } = req.params;
     const sql = `
@@ -481,14 +481,14 @@ const searchItems = (req, res) => {
             return res.status(500).json({ status: 'error', message: err.message });
         }
 
-        // Get all images
+        
         db.query(imagesSql, (err, images) => {
             if (err) {
                 console.error("❌ Images SQL Error:", err.message);
                 return res.status(500).json({ status: 'error', message: err.message });
             }
 
-            // Group images by item_id
+            
             const imagesByItem = images.reduce((acc, image) => {
                 if (!acc[image.item_id]) {
                     acc[image.item_id] = [];
